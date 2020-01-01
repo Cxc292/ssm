@@ -18,6 +18,7 @@ public class CustomerController {
         System.out.println("从页面获取的id是:"+id);
         Customer customer = customerService.ById(id);
         System.out.println("666666666");
+
         model.addAttribute("customer",customer);
         return "info";
     }
