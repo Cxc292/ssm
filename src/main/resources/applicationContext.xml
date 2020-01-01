@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--由spring管理整个com.itcxc-->
+    <context:component-scan base-package="com.itcxc"/>
+
+    <!--1数据源封装类 .数据源：获取数据库连接，spring-jdbc.jar中-->
+    <context:property-placeholder location="classpath:database.properties"/>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.name}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+    <!-- 2创建Mybatis的工厂 -->
+    <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 数据库连接信息来源于dataSource -->
+        <property name="dataSource" ref="dataSource"></property>
+        <!-- 核心配置文件的位置 -->
+        <property name="configLocation" value="classpath:sqlMapConfig.xml"/>
+    </bean>
+
+    <!-- 3扫描器相当于mybatis.xml中 mappers下package标签,扫描com.sbw.mapper包后会给对应接口创建对象-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 要扫描哪个包 -->
+        <property name="basePackage" value="com.itcxc.mapper"></property>
+    </bean>
+
+    <!--4声明事务-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!-- 5开启注解 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+</beans>
